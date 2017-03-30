@@ -6,7 +6,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import database.DBAction;
 
 /**
  * Servlet implementation class ServletInternaute
@@ -28,7 +27,9 @@ public class ServletInternaute extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		DBAction.DBConnexion();
+		response.setContentType("text/html");
+		request.getRequestDispatcher("/views/index.jsp").forward(request, response);;
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**

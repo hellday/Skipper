@@ -5,7 +5,7 @@
     <context-root>/Skipper</context-root>
     
     <security-role-mapping>
-        <role-name>utilisateurs</role-name>
+        <role-name>utilisateur</role-name>
         <group-name>utilisateurs</group-name>
  	</security-role-mapping>
 

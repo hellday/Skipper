@@ -10,41 +10,59 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+
   
-  <servlet>
-        <servlet-name>ServletInternaute</servlet-name>
-        <servlet-class>servlets.ServletInternaute</servlet-class>
-   </servlet>
-   <servlet-mapping>
-        <servlet-name>ServletInternaute</servlet-name>
-        <url-pattern>/ServInternaute</url-pattern>
-   </servlet-mapping>
-   
-   <session-config>
-   		<session-timeout> 30 </session-timeout>
-   </session-config> 
-   
-   <login-config>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  
+  <login-config>
     <auth-method>BASIC</auth-method>
     <realm-name>skipperRealm</realm-name>
   </login-config>
   
   <security-constraint>
     <web-resource-collection>
-        <web-resource-name>Pages securisées utilisateurs</web-resource-name>
-        <url-pattern>/acceuil/*</url-pattern>
+      <web-resource-name>Pages securisées utilisateurs</web-resource-name>
+      <url-pattern>/internautes/*</url-pattern>
     </web-resource-collection>
-    
     <auth-constraint>
-        <role-name> utilisateurs </role-name>
+      <role-name>utilisateur</role-name>
     </auth-constraint>
-</security-constraint>
+  </security-constraint>
   
-  <security-role>
-   	 <role-name> utilisateurs</role-name>
-</security-role>
-<security-role>
-   	 <role-name> admin</role-name>
-</security-role>
-   
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Pages securisées admin</web-resource-name>
+      <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
+   <servlet>
+    <display-name>Internaute</display-name>
+    <servlet-name>ServletInternaute</servlet-name>
+    <servlet-class>servlets.ServletInternaute</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <display-name>Admin</display-name>
+    <servlet-name>ServletAdmin</servlet-name>
+    <servlet-class>servlets.ServletAdmin</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ServletInternaute</servlet-name>
+    <url-pattern>/internautes/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletAdmin</servlet-name>
+    <url-pattern>/admin/*</url-pattern>
+  </servlet-mapping>
+  
+  
+  
 </web-app>
