@@ -17,6 +17,8 @@
 
     <!-- Custom CSS -->
     <link href="../css/googlemap.css" rel="stylesheet">
+   
+    
     <style>
     body {
         padding-top: 70px;
@@ -63,18 +65,26 @@
         <div class="row">
             <div class="col-sm-3">
                 <h1>Liste des navigateurs</h1>
-                <p class="lead">Photo cliquable, miniature et noms</p>              
+                
+    <ul data-role="listview">
+      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 1</a></li>
+      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 2</a></li>
+      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 3</a></li>
+      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 4</a></li>
+    </ul>
+         
             </div>
             
             <div class="col-sm-6 text-center">
             <div class="Flexible-container">
-                <div id="map" style="width:400px;height:400px;"></div>
+                <div id="map" style="width:800px;height:800px;"></div>
             </div>
+           	<br><br>
             <form>
             	<input id="textMessage" type="text">
             	<input onclick="sendMessage();" value="Send Message" type="button">
             </form>
-            <br><textarea readonly id="messagesTextArea" row="50" cols="50"></textarea>
+            <br><textarea class="form-control" readonly id="messagesTextArea" rows="5"></textarea>
             </div>
             
             <div class="col-sm-3">
@@ -86,6 +96,8 @@
 
     </div>
     <!-- /.container -->
+    
+    
 
     <!-- jQuery Version 1.11.1 -->
     <script src="../js/jquery.js"></script>
@@ -163,7 +175,7 @@ var marker;
 
 function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 13,
+    zoom: 5,
     center: {lat: 48.85, lng: 2.31}
   });
 
