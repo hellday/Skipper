@@ -25,6 +25,29 @@
         /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
     }
     </style>
+    
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 500px;
+        width: 500px;
+      }
+      
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    </style>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -67,29 +90,33 @@
                 <h1>Liste des navigateurs</h1>
                 
     <ul data-role="listview">
-      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 1</a></li>
-      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 2</a></li>
-      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 3</a></li>
-      <li><img src="../img/profil.png" alt="profil" width="25%"><br><a href="#">Navigateur 4</a></li>
+      <li><a href="#" id="nav1">Terry Grosso</a></li><br>
+      <li><a href="#" id="nav2">Nicolas Olivier</a></li><br>
+      <li><a href="#" id="nav3">Moaz Chaudry</a></li><br>
+      <li><a href="#" id="nav4">Jean Clémenceau</a></li>
     </ul>
          
             </div>
             
             <div class="col-sm-6 text-center">
-            <div class="Flexible-container">
-                <div id="map" style="width:800px;height:800px;"></div>
-            </div>
+            	<div id="floating-panel">
+			     
+			      <input onclick="showMarkers();" type=button value="Afficher tous les navigateurs">
+			      
+			    </div>
+                <div id="map"></div>
+            
            	<br><br>
-            <form>
+           <!--   <form>
             	<input id="textMessage" type="text">
             	<input onclick="sendMessage();" value="Send Message" type="button">
-            </form>
+            </form> -->
             <br><textarea class="form-control" readonly id="messagesTextArea" rows="5"></textarea>
             </div>
             
             <div class="col-sm-3">
-                <h1>Photo du navigateur et son navire.</h1>
-                <p class="lead">Palmarès du navigateur sélectionné par un click (dans la liste à gauche).</p>            
+                <h1>Photo du navigateur et son navire :</h1>
+                <p class="lead"><img src="../img/profil.png" alt="profil" width="25%"></p>            
             </div>
         </div>
         <!-- /.row -->
@@ -106,8 +133,20 @@
     <script src="../js/bootstrap.min.js"></script>
     
     <script language="javascript" type="text/javascript">
+    
+    
+    
+    
 ///Script du WebSocket
 var messagesTextArea = document.getElementById("messagesTextArea");
+var nav;
+var poly;
+var path;
+
+document.getElementById("nav1").onclick = function(){getLocations(1);}
+document.getElementById("nav2").onclick = function(){getLocations(2);}
+document.getElementById("nav3").onclick = function(){getLocations(3);}
+document.getElementById("nav4").onclick = function(){getLocations(4);}
 
 function getRootUri() {
                 return "ws://" + (document.location.hostname == "" ?
@@ -133,12 +172,35 @@ function getRootUri() {
             
             
             function onOpen(evt) {
-            	alert("Opened!");
                 messagesTextArea.value += "Server connected..." + "\n";
             }
             function onMessage(evt)  {
-            	//document.getElementById("lab").innerHTML = evt.data ;
-            	messagesTextArea.value += "Receive from server => " + evt.data + "\n";
+            	messagesTextArea.value += "Receive from server => " + evt.data + "\n from idNav => " + nav + "\n";
+            	
+            	deleteMarkers(); //Clean la map
+            	
+            	// Récupération des coordonnées & Création des marqueurs sur la map
+            	var array = evt.data.split('%');
+            	var arrayLength = array.length;
+            	
+         
+            	// Ajout des marqueurs
+            	for (var i = 0; i < arrayLength; i++) {
+            		          		
+            	    var latlng = getLatLngFromString(array[i])
+            	    
+            	    if(i == arrayLength-1){
+            	    	addMarker(latlng, nav, true); 
+            	    }else {
+            	    	addMarker(latlng, nav, false); 
+            	    }
+            	}
+            	
+            	
+            	
+            	
+            	
+            	
             }
             function onError(evt) {
                 afficher('<span style="color: red;">ERREUR:</span> ' + evt.data);
@@ -147,7 +209,7 @@ function getRootUri() {
                 websocket.send(donnesATransmettre);
             }
             function onClose(evt) {
-            	alert("Closed!");
+            	alert("Serveur déconnecté");
             	websocket.send("Client disconnected...");
             	messagesTextArea.value += "Server disconnected..." + "\n";
             }
@@ -158,44 +220,173 @@ function getRootUri() {
             	}else {
             		websocket.send(textMessage.value);
             		messagesTextArea.value += "Send to server => " + textMessage.value + "\n";
+            		nav = textMessage.value;
             		textMessage.value="";
             	}
             }
+            
+            function getLatLngFromString(ll) {
+                var latlng = ll.split(/, ?/)
+                return new google.maps.LatLng(parseFloat(latlng[0]), parseFloat(latlng[1])); 
+            }
+            
+            function getLocations(idnav) {
+            	nav = idnav;
+                websocket.send(idnav);
+            }
 
 //window.addEventListener("load", ouvrir , false);
-</script>
-    
-    <script>
 
-// The following example creates a marker in Stockholm, Sweden using a DROP
-// animation. Clicking on the marker will toggle the animation between a BOUNCE
-// animation and no animation.
 
-var marker;
 
-function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 5,
-    center: {lat: 48.85, lng: 2.31}
-  });
+ // The following example creates a marker in Stockholm, Sweden using a DROP
+ // animation. Clicking on the marker will toggle the animation between a BOUNCE
+ // animation and no animation.
 
-  marker = new google.maps.Marker({
-    map: map,
-    draggable: false,
-    animation: google.maps.Animation.DROP,
-    title: 'Hello World!',
-    position: {lat: 48.85, lng: 2.31}
-  });
-  marker.addListener('click', toggleBounce);
-}
+ var map;
+ var marker;
+ var markers = [];
 
-function toggleBounce() {
-  if (marker.getAnimation() !== null) {
-    marker.setAnimation(null);
-  } else {
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-  }
-}
+
+ function initMap() {
+   map = new google.maps.Map(document.getElementById('map'), {
+     zoom: 8,
+     center: {lat: 47.795973, lng: -4.375638}
+   });
+
+   var latlng = new google.maps.LatLng(47.795973, -4.375638);
+   
+// Création de la route entre les points
+	poly = new google.maps.Polyline({
+     strokeColor: '#000000',
+     strokeOpacity: 1.0,
+     strokeWeight: 3
+   });
+   poly.setMap(map);
+   path = poly.getPath();
+   
+   
+   showMarkers();
+ }
+
+ //Adds a marker to the map and push to the array.
+ function addMarker(location, idNav, isLast) {
+	 if(idNav == 1 & isLast){
+	   var marker = new google.maps.Marker({
+	     position: location,
+	     draggable: false,
+	     icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+	     map: map
+	   });
+	   markers.push(marker);
+	 }else if(idNav == 1){
+		 var marker = new google.maps.Marker({
+		     position: location,
+		     draggable: false,
+		     icon: 'http://maps.google.com/mapfiles/ms/icons/blue-pushpin.png',
+		     map: map
+		   });
+		 markers.push(marker);
+	 }
+	 
+	 if(idNav == 2 & isLast){
+		   var marker = new google.maps.Marker({
+		     position: location,
+		     draggable: false,
+		     icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+		     map: map
+		   });
+		   markers.push(marker);
+		 }else if(idNav == 2){
+			 var marker = new google.maps.Marker({
+			     position: location,
+			     draggable: false,
+			     icon: 'http://maps.google.com/mapfiles/ms/icons/grn-pushpin.png',
+			     map: map
+			   });
+			   markers.push(marker);
+		 }
+	 
+	 if(idNav == 3 & isLast){
+		   var marker = new google.maps.Marker({
+		     position: location,
+		     draggable: false,
+		     icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+		     map: map
+		   });
+		   markers.push(marker);
+		 }else if(idNav == 3){
+			 var marker = new google.maps.Marker({
+			     position: location,
+			     draggable: false,
+			     icon: 'http://maps.google.com/mapfiles/ms/icons/red-pushpin.png',
+			     map: map
+			   });
+			   markers.push(marker);
+		 }
+	 
+	 if(idNav == 4 & isLast){
+		   var marker = new google.maps.Marker({
+		     position: location,
+		     draggable: false,
+		     icon: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+		     map: map
+		   });
+		   markers.push(marker);
+		 }else if(idNav == 4){
+			 var marker = new google.maps.Marker({
+			     position: location,
+			     draggable: false,
+			     icon: 'http://maps.google.com/mapfiles/ms/icons/ylw-pushpin.png',
+			     map: map
+			   });
+			   markers.push(marker);
+		 }
+	 
+	 
+	 path.push(location)
+ }
+
+ //Sets the map on all markers in the array.
+ function setMapOnAll(map) {
+   for (var i = 0; i < markers.length; i++) {
+     markers[i].setMap(map);
+   }
+ }
+
+ //Removes the markers from the map, but keeps them in the array.
+ function clearMarkers() {
+   setMapOnAll(null);
+ }
+
+ // Shows any markers currently in the array.
+ function showMarkers() {
+   setMapOnAll(map);
+ }
+
+  // Deletes all markers in the array by removing references to them.
+       function deleteMarkers() {
+         clearMarkers();
+         markers = [];
+         path.clear();
+       }
+
+ function toggleBounce() {
+   if (marker.getAnimation() !== null) {
+     marker.setAnimation(null);
+   } else {
+     marker.setAnimation(google.maps.Animation.BOUNCE);
+   }
+ }
+
+ function myFunction() {
+ 	marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+ }
+
+ function clearMap() {
+ 	map.clear()
+ }
+
 
     </script>
 
